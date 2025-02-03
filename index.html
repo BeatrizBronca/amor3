@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossa História ❤️</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            grid-template-rows: 1fr 90px;
+            height: 100vh;
+            background-color: #121212;
+            color: white;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background-color: #000;
+            padding: 1rem;
+            grid-row: 1 / 2;
+        }
+
+        .logo {
+            color: #ff6b95;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            background: linear-gradient(to bottom, #404040, #121212);
+            overflow-y: auto;
+            padding: 2rem;
+            grid-row: 1 / 2;
+            grid-column: 1 / -1;
+        }
+
+        .date-counter {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(255, 107, 149, 0.1);
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .memories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .memory-card {
+            background-color: #181818;
+            padding: 1rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .memory-card:hover {
+            background-color: #282828;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(255, 107, 149, 0.2);
+        }
+
+        .memory-img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .memory-card h3 {
+            color: #ff6b95;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .memory-card p {
+            color: #b3b3b3;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .memory-song {
+            background-color: rgba(255, 107, 149, 0.1);
+            padding: 0.8rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .memory-song:hover {
+            background-color: rgba(255, 107, 149, 0.2);
+        }
+
+        .memory-song h4 {
+            color: #ff6b95;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .memory-song p {
+            font-size: 0.8rem;
+            margin: 0;
+            color: #b3b3b3;
+        }
+
+        /* Player Bar */
+        .player-bar {
+            background-color: #181818;
+            grid-column: 1 / -1;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            align-items: center;
+            border-top: 1px solid #282828;
+        }
+
+        .now-playing {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Estilo para a imagem da música no player */
+        .now-playing img {
+            width: 56px; /* Tamanho fixo */
+            height: 56px; /* Tamanho fixo */
+            border-radius: 4px; /* Bordas arredondadas */
+            object-fit: cover; /* Garante que a imagem cubra o espaço sem distorcer */
+        }
+
+        .track-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .play-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .play-button {
+            background-color: #ff6b95;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: #4f4f4f;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .progress {
+            position: absolute;
+            height: 100%;
+            background-color: #ff6b95;
+            border-radius: 2px;
+            width: 30%;
+        }
+
+        .heart-animation {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <main class="main-content">
+        <div class="date-counter">
+            <h2>Tempo Juntas ❤️</h2>
+            <p id="timeCounter">Carregando...</p>
+            <p id="daysCounter" style="margin-top: 0.5rem; color: #ff6b95;">Carregando...</p>
+        </div>
+
+        <div class="memories-grid" id="memoriesGrid"></div>
+    </main>
+
+    <div class="player-bar">
+        <div class="now-playing">
+            <img src="/api/placeholder/56/56" alt="Capa da música">
+            <div class="track-info">
+                <strong id="currentSongTitle">Selecione uma música</strong>
+                <span id="currentArtist">-</span>
+            </div>
+            <span class="heart-animation">❤️</span>
+        </div>
+
+        <div class="play-controls">
+            <div class="control-buttons">
+                <button class="play-button" id="prevButton">⏮</button>
+                <button class="play-button" id="playButton">▶</button>
+                <button class="play-button" id="nextButton">⏭</button>
+            </div>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+
+        <div style="text-align: right;">
+            <span style="color: #ff6b95;">Nossa Playlist de Amor</span>
+        </div>
+    </div>
+
+    <!-- Player de áudio invisível -->
+    <audio id="audioPlayer" controls style="display: none;"></audio>
+
+   
+</div>
+
+
+    <script>
+        // Lista de músicas com URLs de áudio
+        const songs = [
+            { id: 1, title: "Video Games", artist: "Lana Del Rey", image: "Fotos/IMG_20231104_235945.jpg", date: "04/11/2023", audio: "musicas/Lana Del Rey - Video Games.mp3" },
+            { id: 2, title: "Yellow", artist: "Coldplay", image: "Fotos/IMG_20240524_205422.jpg", date: "24/05/2024", audio: "musicas/@coldplay - Yellow (Lyrics).mp3" },
+            { id: 3, title: "Dusk Till Dawn", artist: "Zayn", image: "Fotos/IMG_20240712_220804.jpg", date: "12/07/2024", audio: "musicas/ZAYN & Sia - Dusk Till Dawn (Lyrics).mp3" },
+            { id: 4, title: "Just the Way You Are", artist: "Bruno Mars", image: "Fotos/IMG_20250111_143645.jpg", date: "11/01/2025", audio: "musicas/Bruno Mars - Just The Way You Are (Lyrics).mp3" },
+            { id: 5, title: "Mirrors", artist: "Justin Timberlake", image: "Fotos/IMG-20240217-WA0024.jpg", date: "17/02/2024", audio: "musicas/Justin Timberlake - Mirrors (Official Video).mp3" },
+            { id: 6, title: "Te Vivo", artist: "Luan Santana", image: "Fotos/IMG-20240606-WA0053.jpg", date: "06/06/2024", audio: "musicas/Luan Santana - Te Vivo (Clipe Oficial).mp3" },
+            { id: 7, title: "Those Eyes", artist: "New West", image: "Fotos/IMG-20240721-WA0003.jpg", date: "21/07/2024", audio: "musicas/New West - Those Eyes (Lyrics).mp3" },
+            { id: 8, title: "Anyone", artist: "Justin Bieber", image: "Fotos/IMG-20240728-WA0001.jpg", date: "28/07/2024", audio: "musicas/Justin Bieber - Anyone (Lyrics).mp3" },
+            { id: 9, title: "Um Amor Puro", artist: "Djavan", image: "Fotos/IMG-20240823-WA0050.jpg", date: "23/08/2024", audio: "musicas/Djavan - Um Amor Puro (Áudio Oficial).mp3" },
+            { id: 10, title: "Iris", artist: "Goo Goo Dolls", image: "Fotos/IMG-20241228-WA0026.jpg", date: "28/12/2024", audio: "musicas/Goo Goo Dolls - Iris.mp3" }
+        ];
+
+        // Referências aos elementos do player
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playButton = document.getElementById('playButton');
+        const prevButton = document.getElementById('prevButton');
+        const nextButton = document.getElementById('nextButton');
+        const currentSongTitle = document.getElementById('currentSongTitle');
+        const currentArtist = document.getElementById('currentArtist');
+        const nowPlayingImg = document.querySelector('.now-playing img');
+
+        let currentSongIndex = 0; // Índice da música atual
+        let isPlaying = false; // Estado de reprodução
+
+        // Função para carregar e tocar uma música
+        function playSong(songId) {
+            const song = songs.find(s => s.id === songId);
+            if (song) {
+                // Atualiza o player de áudio
+                audioPlayer.src = song.audio;
+                audioPlayer.play();
+
+                // Atualiza a interface
+                currentSongTitle.textContent = song.title;
+                currentArtist.textContent = song.artist;
+                nowPlayingImg.src = song.image;
+                playButton.textContent = '⏸';
+                isPlaying = true;
+
+                // Atualiza o índice da música atual
+                currentSongIndex = songs.indexOf(song);
+            } else {
+                alert('Música não encontrada.');
+            }
+        }
+
+        // Função para pausar ou retomar a reprodução
+        playButton.addEventListener('click', () => {
+            if (isPlaying) {
+                audioPlayer.pause();
+                playButton.textContent = '▶';
+            } else {
+                audioPlayer.play();
+                playButton.textContent = '⏸';
+            }
+            isPlaying = !isPlaying;
+        });
+
+        // Função para tocar a música anterior
+        prevButton.addEventListener('click', () => {
+            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+            playSong(songs[currentSongIndex].id);
+        });
+
+        // Função para tocar a próxima música
+        nextButton.addEventListener('click', () => {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            playSong(songs[currentSongIndex].id);
+        });
+
+        // Cria os cards de memória
+        const memoriesGrid = document.getElementById('memoriesGrid');
+        songs.forEach(memory => {
+            const card = document.createElement('div');
+            card.className = 'memory-card';
+
+            card.innerHTML = `
+                <img src="${memory.image}" alt="Memória" class="memory-img">
+                <p>${memory.date}</p>
+                <div class="memory-song" onclick="playSong(${memory.id})">
+                    <h4>${memory.title}</h4>
+                    <p>${memory.artist}</p>
+                </div>
+            `;
+            memoriesGrid.appendChild(card);
+        });
+
+        // Contador de tempo juntas
+        const startDate = new Date('2023-11-04');
+
+        function updateCounters() {
+            const now = new Date();
+            let diffTime = now - startDate;
+
+            const totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            let years = now.getFullYear() - startDate.getFullYear();
+            let months = now.getMonth() - startDate.getMonth();
+            let days = now.getDate() - startDate.getDate();
+
+            if (days < 0) {
+                months--;
+                const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+                days += prevMonth.getDate();
+            }
+
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+
+            document.getElementById('timeCounter').textContent =
+                `${years} anos, ${months} meses, ${days} dias, ${hours} horas, ${minutes} minutos e ${seconds} segundos juntas ❤️`;
+
+            document.getElementById('daysCounter').textContent =
+                `${totalDays} dias de amor ❤️`;
+        }
+
+        updateCounters();
+        setInterval(updateCounters, 1000);
+    </script>
+</body>
+</html>
