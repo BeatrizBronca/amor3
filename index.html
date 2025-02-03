@@ -186,6 +186,7 @@
             background-color: #4f4f4f;
             border-radius: 2px;
             position: relative;
+            cursor: pointer;
         }
 
         .progress {
@@ -193,12 +194,21 @@
             height: 100%;
             background-color: #ff6b95;
             border-radius: 2px;
-            width: 30%;
+            width: 0%;
         }
 
         .heart-animation {
             animation: pulse 1.5s infinite;
         }
+
+        .message-box {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 107, 149, 0.1);
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 0 auto 2rem;}
 
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -213,6 +223,12 @@
             <h2>Tempo Juntas ❤️</h2>
             <p id="timeCounter">Carregando...</p>
             <p id="daysCounter" style="margin-top: 0.5rem; color: #ff6b95;">Carregando...</p>
+        </div>
+
+        <div class="message-box">
+            <p id="romanticMessage">Feliz 1 ano e 3 meses, meu amor! <br>
+                eu soube que era você <br>na primeira vez que te vi <br> e sem dizer nada <br> você mudou tudo ao meu redor <br>o humor, as cores <br>a minha frequência cardíaca. <br>eu soube que era amor <br>quando todos os dias <br> pareciam ser a primeira vez. <br> EU TE AMO!
+            </p>
         </div>
 
         <div class="memories-grid" id="memoriesGrid"></div>
@@ -234,8 +250,8 @@
                 <button class="play-button" id="playButton">▶</button>
                 <button class="play-button" id="nextButton">⏭</button>
             </div>
-            <div class="progress-bar">
-                <div class="progress"></div>
+            <div class="progress-bar" id="progressBar">
+                <div class="progress" id="progress"></div>
             </div>
         </div>
 
@@ -246,10 +262,6 @@
 
     <!-- Player de áudio invisível -->
     <audio id="audioPlayer" controls style="display: none;"></audio>
-
-   
-</div>
-
 
     <script>
         // Lista de músicas com URLs de áudio
@@ -274,6 +286,8 @@
         const currentSongTitle = document.getElementById('currentSongTitle');
         const currentArtist = document.getElementById('currentArtist');
         const nowPlayingImg = document.querySelector('.now-playing img');
+        const progressBar = document.getElementById('progressBar');
+        const progress = document.getElementById('progress');
 
         let currentSongIndex = 0; // Índice da música atual
         let isPlaying = false; // Estado de reprodução
@@ -322,6 +336,20 @@
         nextButton.addEventListener('click', () => {
             currentSongIndex = (currentSongIndex + 1) % songs.length;
             playSong(songs[currentSongIndex].id);
+        });
+
+        // Atualiza a barra de progresso conforme a música toca
+        audioPlayer.addEventListener('timeupdate', () => {
+            const progressPercent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progress.style.width = `${progressPercent}%`;
+        });
+
+        // Permite clicar na barra de progresso para avançar ou retroceder a música
+        progressBar.addEventListener('click', (e) => {
+            const clickPosition = e.offsetX; // Posição do clique na barra
+            const progressBarWidth = progressBar.clientWidth; // Largura total da barra
+            const seekTime = (clickPosition / progressBarWidth) * audioPlayer.duration; // Tempo correspondente
+            audioPlayer.currentTime = seekTime; // Define o tempo da música
         });
 
         // Cria os cards de memória
